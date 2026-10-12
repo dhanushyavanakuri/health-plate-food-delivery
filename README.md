@@ -1,6 +1,6 @@
 <<<<<<< HEAD
 # HealthPlate
-
+🌐 Visit Health Plate
 Restaurant discovery filtered by **health condition**, not just cuisine or price.
 
 Apps like Zomato and Swiggy only offer veg/non-veg. HealthPlate lets someone
