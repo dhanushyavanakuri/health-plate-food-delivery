@@ -1,192 +1,190 @@
-<<<<<<< HEAD
 # HealthPlate
-🌐 Visit Health Plate
-Restaurant discovery filtered by **health condition**, not just cuisine or price.
 
-Apps like Zomato and Swiggy only offer veg/non-veg. HealthPlate lets someone
-managing diabetes, hypertension, coeliac disease or a nut allergy filter a whole
-city's restaurants down to the dishes they can actually eat.
+**A health-aware restaurant and dish discovery application.**
 
-## What it does
+🌐 **Live Website:** (https://wtpbl-rho.vercel.app/)
 
-- **JWT auth** with a saved health profile (conditions + allergies)
-- **Restaurant listing** with real haversine distance, cuisine, price and rating
-- **Dish tagging** — any logged-in user can add a dish with health tags and allergens
-- **Safe for me** — one tap filters everything to your saved profile
-- **Health condition filter bar** — manual multi-select, independent of the profile
-- **Community voting** — upvote/downvote whether a dish's tags are accurate,
-  with a confidence score that sorts results
-- **Dish detail** — tags, allergens, vote counts and an editable ordering tip
+HealthPlate helps users discover restaurants and dishes based on health conditions, dietary preferences, and allergies. Unlike conventional food delivery platforms that primarily filter by cuisine or price, HealthPlate focuses on dish-level health information.
 
-## Stack
+## Features
 
-| Layer    | Tech                                  |
-| -------- | ------------------------------------- |
-| Frontend | React 18 + Vite + Tailwind CSS        |
-| Backend  | Node.js + Express                     |
-| Database | MongoDB via Mongoose                  |
-| External | Google Places API (optional)          |
-| Deploy   | Vercel (frontend) + Render (backend)  |
+- **JWT authentication:** User accounts with saved health profiles, dietary preferences, and allergies.
+- **Restaurant discovery:** Browse and filter restaurants by cuisine, price, rating, and distance.
+- **Health-aware dish tagging:** Add dishes with health tags and allergen information.
+- **Safe for Me:** Filter dishes according to a saved health profile.
+- **Health condition filters:** Manually select multiple health-related filters.
+- **Community voting:** Upvote or downvote dish-tag accuracy, with confidence-based ranking.
+- **Dish details:** View health tags, allergens, voting information, and ordering tips.
 
-## Quick start
+## Tech Stack
 
-Two terminals.
+| Layer | Technology |
+|---|---|
+| Frontend | React 18, Vite, Tailwind CSS |
+| Backend | Node.js, Express |
+| Database | MongoDB with Mongoose |
+| External service | Google Places API (optional) |
+| Deployment | Vercel (frontend), Render (backend) |
+
+## Quick Start
+
+You need two terminals to run the backend and frontend separately.
+
+### 1. Backend
 
 ```bash
-# 1. Backend
 cd backend
 npm install
-npm run seed     # 30 restaurants + 150 dishes
-npm run dev      # http://localhost:5000
+npm run seed
+npm run dev
+```
 
-# 2. Frontend
+The backend runs at `http://localhost:5000`.
+
+### 2. Frontend
+
+Open a second terminal:
+
+```bash
 cd frontend
 npm install
-npm run dev      # http://localhost:5173
+npm run dev
 ```
 
-No `.env` is required for local development. With `MONGODB_URI` empty the backend
-starts an in-memory MongoDB automatically, so a fresh clone runs with zero setup.
+The frontend runs at `http://localhost:5173`.
 
-**Demo login:** `demo@healthplate.app` / `demo1234`
+### Demo Login
 
-### One caveat about the in-memory database
+- **Email:** `demo@healthplate.app`
+- **Password:** `demo1234`
 
-The fallback database lives inside the server process and is discarded when it
-exits. That means `npm run seed` and `npm run dev` must run **in the same
-process** to share data. Two options:
+Use these credentials only if the demo account is available in your running environment.
 
-- **Quickest demo** — start the server with a single command that seeds and serves:
-  ```bash
-  cd backend
-  npm run dev:seed
-  ```
-- **Persistent** — set `MONGODB_URI` to a free MongoDB Atlas cluster and run
-  `npm run seed` once. Data survives restarts, which is what you want on Render.
+## Database Configuration
 
-## Environment variables
+For local development, the application can use an in-memory MongoDB fallback when `MONGODB_URI` is empty.
 
-Copy `backend/.env.example` to `backend/.env`. Every value has a working default
-except `JWT_SECRET`, which must be changed in production (the server refuses to
-boot with the default value when `NODE_ENV=production`).
+The in-memory database is temporary: its data is lost when the server process exits. Use the project's seed-and-serve command, if configured, to seed and run the backend in the same process.
 
-| Variable                | Default                  | Purpose                                             |
-| ----------------------- | ------------------------ | --------------------------------------------------- |
-| `PORT`                  | `5000`                   | API port                                            |
-| `MONGODB_URI`           | _(empty)_                | Atlas URI. Empty means in-memory fallback           |
-| `JWT_SECRET`            | `dev-only-change-me`     | Token signing secret. **Change in production**      |
-| `JWT_EXPIRES_IN`        | `7d`                     | Token lifetime                                      |
-| `CLIENT_URL`            | `http://localhost:5173`  | Comma-separated CORS origins                        |
-| `GOOGLE_PLACES_API_KEY` | _(empty)_                | Optional. Empty means seeded restaurants only       |
-| `DEFAULT_LAT`/`_LNG`    | Andheri West, Mumbai     | Fallback map centre when geolocation is unavailable  |
+For persistent data, configure a MongoDB Atlas connection using `MONGODB_URI`.
 
-## Google Places
+## Environment Variables
 
-Optional by design. The app is fully functional without it, which is what makes
-the demo reliable.
+Create your backend environment file from the provided example:
 
-With a key set, `POST /api/restaurants/search-nearby` calls the Places Text Search
-API, upserts the results into Mongo, and serves them alongside seeded data. Health
-tags are never inferred from Google data — the community supplies those.
-
-## Location handling
-
-The frontend asks the browser for geolocation and silently falls back to the
-configured demo centre when permission is denied or ignored. The UI always states
-which origin it is using, so the fallback is visible rather than a mystery.
-
-## API reference
-
-### Auth
+```bash
+# Run from the project root
+copy backend\.env.example backend\.env
 ```
-POST   /api/auth/signup        { name, email, password, dietary_preferences[], allergies[] }
-POST   /api/auth/login         { email, password }
-GET    /api/auth/me
-PATCH  /api/auth/me            { name?, dietary_preferences[]?, allergies[]? }
-GET    /api/auth/config        health tag + allergen enums
-```
+
+| Variable | Purpose |
+|---|---|
+| `PORT` | Backend API port; defaults to `5000` |
+| `MONGODB_URI` | MongoDB connection string |
+| `JWT_SECRET` | Secret used to sign authentication tokens |
+| `JWT_EXPIRES_IN` | Token lifetime |
+| `CLIENT_URL` | Allowed frontend origin or origins |
+| `GOOGLE_PLACES_API_KEY` | Optional Google Places API key |
+| `DEFAULT_LAT` / `DEFAULT_LNG` | Fallback map coordinates |
+
+Set a strong, unique `JWT_SECRET` in production. Never commit real secrets or `.env` files to GitHub.
+
+## Google Places Integration
+
+Google Places integration is optional. Without an API key, the application can use its seeded restaurant data.
+
+When configured, the nearby-search endpoint can retrieve restaurant results from Google Places and store them in the database. Health tags should be supplied by the community rather than assumed from external restaurant data.
+
+## Location Handling
+
+The frontend requests browser geolocation and can fall back to a configured demo location when permission is unavailable. The interface should indicate which location is being used.
+
+## API Reference
+
+### Authentication
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| POST | `/api/auth/signup` | Register a user |
+| POST | `/api/auth/login` | Authenticate a user |
+| GET | `/api/auth/me` | Retrieve the current user's profile |
+| PATCH | `/api/auth/me` | Update profile preferences and allergies |
+| GET | `/api/auth/config` | Retrieve health-tag and allergen options |
 
 ### Restaurants
-```
-GET    /api/restaurants
-       ?health_tags=diabetic_friendly,gluten_free
-       &exclude_tags=low_oil
-       &avoid_allergens=dairy,nuts
-       &cuisine=North%20Indian
-       &price=$,$$
-       &search=biryani
-       &radius_km=5
-       &sort=distance|rating|price_asc|price_desc|name
-       &safe_for_me=true
-       &lat=19.1197&lng=72.8464
-       &limit=50&page=1
-GET    /api/restaurants/:id
-GET    /api/restaurants/meta/filters
-POST   /api/restaurants/search-nearby   { query }
-```
 
-`safe_for_me=true` with a valid token requires dishes to carry **every** saved
-dietary preference and **none** of the saved allergens. Anonymous requests fall
-back to the manual filters rather than failing.
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/api/restaurants` | List and filter restaurants |
+| GET | `/api/restaurants/:id` | Retrieve restaurant details |
+| GET | `/api/restaurants/meta/filters` | Retrieve available filters |
+| POST | `/api/restaurants/search-nearby` | Search for nearby restaurants |
+
+Restaurant listing filters may include health tags, excluded tags, allergens, cuisine, price, search terms, radius, sorting, pagination, and the `safe_for_me` option.
 
 ### Dishes
-```
-GET    /api/dishes  ?health_tags=&search=&sort=confidence|most_voted|newest|name&restaurant_id=
-GET    /api/dishes/:id
-POST   /api/dishes           { name, restaurant_id, health_tags[], allergens[], tip?, description? }
-PATCH  /api/dishes/:id       { health_tags[]?, allergens[]?, tip?, name? }
-POST   /api/dishes/:id/vote  { direction: 'up' | 'down' }
-```
 
-Voting is one-per-user, self-retracting, and flippable. Repeating the same
-direction removes your vote.
+| Method | Endpoint | Purpose |
+|---|---|---|
+| GET | `/api/dishes` | List and filter dishes |
+| GET | `/api/dishes/:id` | Retrieve dish details |
+| POST | `/api/dishes` | Add a dish |
+| PATCH | `/api/dishes/:id` | Update dish information |
+| POST | `/api/dishes/:id/vote` | Vote on dish-tag accuracy |
+
+Voting behavior includes one vote per user, with the ability to retract or change a vote, as implemented by the backend.
 
 ## Testing
 
+Run the backend tests from the backend directory:
+
 ```bash
 cd backend
-npm run smoke    # 36 API checks incl. auth, filters, voting, authorization
-npm run verify   # 18 live HTTP checks against the real response shapes
+npm run smoke
+npm run verify
 ```
 
-Both spin up an in-memory database, so neither needs external services.
+These commands are the project's configured API checks. Their exact coverage depends on the current implementation.
 
-## Data model notes
+## Data Model Notes
 
-**Vote confidence** is `(up - down) / (total + 5)`. The Bayesian prior means a
-dish with one upvote cannot outrank a dish with forty votes at the same ratio, so
-low-vote contributions stay below well-corroborated ones.
+### Vote Confidence
 
-**Seed data** deliberately includes 51 untagged dishes. Those are the "no match"
-cases that make filters visibly exclude something rather than matching everything.
+The documented confidence formula is:
 
-## Out of scope
+`(up - down) / (total + 5)`
 
-Marked as TODOs in the code, not implemented:
+The added constant reduces the influence of dishes with very few votes.
 
-- AI-based auto-tagging from ingredient lists
-- Real-time menu sync from restaurants
-- Payment and ordering
+### Seed Data
 
-## Deploying
+The project seed data includes untagged dishes to demonstrate how health-related filters exclude dishes that do not meet the selected criteria.
 
-**Backend → Render**
+## Deployment
 
-1. New Web Service, connect this repo, root directory `backend`
-2. Build `npm install`, start `npm start`
-3. Set `JWT_SECRET` (auto-generated), `MONGODB_URI` (Atlas free tier),
-   `CLIENT_URL` (your Vercel domain)
-4. Run `npm run seed` once against the same Atlas cluster
+### Backend — Render
 
-`render.yaml` is included if you prefer blueprint deploys.
+1. Create a Render Web Service connected to the repository.
+2. Set the root directory to `backend`.
+3. Set the build command to `npm install`.
+4. Set the start command to `npm start`.
+5. Configure `JWT_SECRET`, `MONGODB_URI`, and `CLIENT_URL`.
+6. Seed the persistent database as required by the project.
 
-**Frontend → Vercel**
+### Frontend — Vercel
 
-1. New Project, root directory `frontend`, framework preset Vite
-2. Set `VITE_API_URL` to your Render URL (no trailing slash)
-3. `vercel.json` already handles SPA rewrites so deep links like
-   `/restaurants/:id` resolve on refresh
-=======
-# health-plate-food-delivery
-Health Plate – An improved food delivery application focused on healthy food choices, nutritional awareness, and a better food ordering experience.
->>>>>>> b4f56f150876a0aafd41548dc437e9b6c950f709
+1. Import the repository into Vercel.
+2. Set the root directory to `frontend`.
+3. Select the Vite framework preset.
+4. Configure `VITE_API_URL` to point to the deployed backend URL, without a trailing slash.
+5. Deploy and test the website.
+
+Check the project's deployment configuration and environment variables before redeploying.
+
+## Future Enhancements
+
+The following features are not currently implemented according to the project notes:
+
+- AI-based health-tag suggestions from ingredient lists
+- Real-time restaurant menu synchronization
+- Online payments and food ordering
