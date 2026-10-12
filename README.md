@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # HealthPlate
 
 Restaurant discovery filtered by **health condition**, not just cuisine or price.
@@ -185,3 +186,7 @@ Marked as TODOs in the code, not implemented:
 2. Set `VITE_API_URL` to your Render URL (no trailing slash)
 3. `vercel.json` already handles SPA rewrites so deep links like
    `/restaurants/:id` resolve on refresh
+=======
+# health-plate-food-delivery
+Health Plate – An improved food delivery application focused on healthy food choices, nutritional awareness, and a better food ordering experience.
+>>>>>>> b4f56f150876a0aafd41548dc437e9b6c950f709
